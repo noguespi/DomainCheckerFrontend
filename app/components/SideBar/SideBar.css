@@ -1,0 +1,6 @@
+.sidebar-wrapper {
+    width: 250px;
+    height: 100%;
+    position: fixed;
+    border-right: 1px solid lightgrey;
+}

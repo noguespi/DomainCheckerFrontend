@@ -1,0 +1,7 @@
+.datepicker__tether-element {
+    z-index: 2;
+}
+
+.datepicker__input-container{
+    display: inline-block;
+}
