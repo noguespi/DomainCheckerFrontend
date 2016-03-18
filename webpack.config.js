@@ -57,11 +57,20 @@ if (TARGET === 'start' || !TARGET) {
         },
 
         plugins: [
-            new webpack.HotModuleReplacementPlugin()
+            new webpack.HotModuleReplacementPlugin(),
+            new webpack.DefinePlugin({
+                'process.env.NODE_ENV': '"dev"'
+            })
         ]
     });
 }
 
 if (TARGET === 'build') {
-    module.exports = merge(common, {});
+    module.exports = merge(common, {
+        plugins: [
+            new webpack.DefinePlugin({
+                'process.env.NODE_ENV': '"prod"'
+            })
+        ]
+    });
 }

@@ -21,11 +21,15 @@ export default class Domains extends React.Component {
         this.props.onDateChange(this.props.expireDate);
     }
 
+    changeIframe(src){
+        this.iframe.src = src;
+    }
+
     tsvExport(){
-        var exported = "domain\texpire\tcreated\trd\tbl\tcf\ttf\tsv\tcpc\n";
+        var exported = "domain\tlen\tcreated\trd\tbl\tcf\ttf\tsv\tcpc\n";
         this.props.domains.forEach(function(item, index){
             exported += item.name + "\t";
-            exported += item.expiration.substr(0, 10) + "\t";
+            exported += item.nameLen + "\t";
             exported += item.created.substr(0, 10) + "\t";
 
             exported += item.majesticRdRefDomains + "\t";
@@ -72,16 +76,16 @@ export default class Domains extends React.Component {
                     <Column
                         columnKey="name"
                         header={<Cell>Link</Cell>}
-                        cell={<LinkCell data={domains} />}
+                        cell={<LinkCell changeIframe={this.changeIframe.bind(this)} data={domains} />}
                         width={50}
                     />
                     <Column
-                        columnKey="expiration"
+                        columnKey="nameLen"
                         header={<SortHeaderCell
                             sortColumn={this.props.sortColumn} sortDir={this.props.sortDir}
-                            onSortChange={this.props.onSortChange}>Expire</SortHeaderCell>}
+                            onSortChange={this.props.onSortChange}>Len</SortHeaderCell>}
                         cell={<TextCell data={domains} />}
-                        width={160}
+                        width={50}
                     />
                     <Column
                         columnKey="created"
@@ -157,7 +161,15 @@ export default class Domains extends React.Component {
                     />
 
                 </Table>
-                <iframe style={{width:"100%", height:(window.innerHeight - 100)/2}} id="bottomFrame" rel="noreferrer" ></iframe>
+                <iframe 
+                    style={{width:"100%", height:(window.innerHeight - 100)/2}} 
+                    ref={function(elt){
+                        console.log("ref", this, elt);
+                        this.iframe = elt;
+                    }.bind(this)}
+                    id="bottomFrame" 
+                    rel="noreferrer" 
+                ></iframe>
             </div>
         )
     }
@@ -210,7 +222,7 @@ class LinkCell extends React.Component {
 
     onClick(e){
         e.preventDefault();
-        document.getElementById("bottomFrame").src = e.currentTarget.getAttribute('href');
+        console.log(this.props.changeIframe(e.currentTarget.getAttribute('href')));
         return false;
     }
 
@@ -218,7 +230,7 @@ class LinkCell extends React.Component {
         const {rowIndex, columnKey, data, ...props} = this.props;
         const domain = data[rowIndex][columnKey];
         const webArchiveUrl = "https://web.archive.org/web/*/" + domain;
-        const majesticUrl = "https://majestic.com/reports/site-explorer?q=" + domain + "&IndexDataSource=F";
+        const majesticUrl = "https://majestic.com/reports/site-explorer?q=" + domain + "&IndexDataSource=F#anchor-text-chart";
         return (
             <Cell {...props}>
                 <a href="#" onClick={this.onClick.bind(this)} href={webArchiveUrl} ><img src="/images/archives.png" /></a>

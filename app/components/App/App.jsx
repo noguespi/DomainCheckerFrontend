@@ -38,42 +38,58 @@ export default class App extends React.Component {
         )
     }
 
+    randString(len){
+        var text = "";
+        var possible = "abcdefghijklmnopqrstuvwxyz0123456789";
+
+        for( var i=0; i < len; i++ )
+            text += possible.charAt(Math.floor(Math.random() * possible.length));
+
+        return text;
+    }
+
     onDateChange(date){
 
-        $.getJSON('/afnic/' + date.format('YYYY-MM-DD'), function(json){
+        if(process.env.NODE_ENV === "dev"){
+            const domains = [];
+            for (var i = 0; i < 1000; i++) {
+                var domainName = this.randString(Math.floor((Math.random() * 20) + 1)) + i + ".fr";
+                domains.push({
+                    name: domainName,
+                    expiration: date.format('YYYY-MM-DD'),
+                    created: moment().format('YYYY-MM-DD'),
+                    majesticRdRefDomains: Math.floor((Math.random() * 10) + 1),
+                    majesticRdExtBackLinks: Math.floor((Math.random() * 10) + 1),
+                    majesticRdCitationFlow: Math.floor((Math.random() * 10) + 1),
+                    majesticRdTrustFlow: Math.floor((Math.random() * 10) + 1),
+                    majesticRdLastCheck: moment().format('YYYY-MM-DD'),
+                    adwordsSearchVolume: Math.floor((Math.random() * 10000) + 1),
+                    adwordsCpc: Math.floor((Math.random() * 10) + 1),
+                    adwordsLastCheck: moment().format('YYYY-MM-DD')
+                })
+            }
+            domains.forEach(function(elt){
+                elt.nameLen = elt.name.length - 3;
+            });
             this.setState({
                 sortColumn: null,
                 sortDir: SortTypes.ASC,
                 expireDate: date,
-                domains: json
+                domains: domains
             });
-        }.bind(this));
-
-        /*
-        const domains = [];
-        for (var i = 0; i < 1000; i++) {
-            domains.push({
-                name: "dom-" + i + ".fr",
-                expire: date.format('YYYY-MM-DD'),
-                created: moment().format('YYYY-MM-DD'),
-                root_rd: Math.floor((Math.random() * 10) + 1),
-                root_bl: Math.floor((Math.random() * 10) + 1),
-                root_cf: Math.floor((Math.random() * 10) + 1),
-                root_tf: Math.floor((Math.random() * 10) + 1),
-                root_mj_check: moment().format('YYYY-MM-DD'),
-                adwords_search_volume: Math.floor((Math.random() * 10000) + 1),
-                adwords_cpc: Math.floor((Math.random() * 10) + 1),
-                adwords_check: moment().format('YYYY-MM-DD')
-            })
+        } else {
+            $.getJSON('/afnic/' + date.format('YYYY-MM-DD'), function(json){
+                json.forEach(function(elt){
+                    elt.nameLen = elt.name.length - 3;
+                });
+                this.setState({
+                    sortColumn: null,
+                    sortDir: SortTypes.ASC,
+                    expireDate: date,
+                    domains: json
+                });
+            }.bind(this));
         }
-        this.setState({
-            sortColumn: null,
-            sortDir: SortTypes.ASC,
-            expireDate: date,
-            domains: domains
-        });
-        */
-
     }
 
     onSortChange(column, dir){
